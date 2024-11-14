@@ -67,3 +67,10 @@ const loadSavedChatHistory = () => {
 
     document.body.classList.toggle("hide-header", savedConversations.length > 0);
 };
+// create a new chat message element
+const createChatMessageElement = (htmlContent, ...cssClasses) => {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", ...cssClasses);
+    messageElement.innerHTML = htmlContent;
+    return messageElement;
+}
