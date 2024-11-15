@@ -172,3 +172,99 @@ const addCopyButtonToCodeBlocks = () => {
         });
     });
 };
+// Show loading animation during API request
+const displayLoadingAnimation = () => {
+    const loadingHtml = `
+
+        <div class="message__content">
+            <img class="message__avatar" src="assets/gemini.svg" alt="Gemini avatar">
+            <p class="message__text"></p>
+            <div class="message__loading-indicator">
+                <div class="message__loading-bar"></div>
+                <div class="message__loading-bar"></div>
+                <div class="message__loading-bar"></div>
+            </div>
+        </div>
+        <span onClick="copyMessageToClipboard(this)" class="message__icon hide"><i class='bx bx-copy-alt'></i></span>
+    
+    `;
+
+    const loadingMessageElement = createChatMessageElement(loadingHtml, "message--incoming", "message--loading");
+    chatHistoryContainer.appendChild(loadingMessageElement);
+
+    requestApiResponse(loadingMessageElement);
+};
+
+// Copy message to clipboard
+const copyMessageToClipboard = (copyButton) => {
+    const messageContent = copyButton.parentElement.querySelector(".message__text").innerText;
+
+    navigator.clipboard.writeText(messageContent);
+    copyButton.innerHTML = `<i class='bx bx-check'></i>`; // Confirmation icon
+    setTimeout(() => copyButton.innerHTML = `<i class='bx bx-copy-alt'></i>`, 1000); // Revert icon after 1 second
+};
+
+// Handle sending chat messages
+const handleOutgoingMessage = () => {
+    currentUserMessage = messageForm.querySelector(".prompt__form-input").value.trim() || currentUserMessage;
+    if (!currentUserMessage || isGeneratingResponse) return; // Exit if no message or already generating response
+
+    isGeneratingResponse = true;
+
+    const outgoingMessageHtml = `
+    
+        <div class="message__content">
+            <img class="message__avatar" src="assets/profile.png" alt="User avatar">
+            <p class="message__text"></p>
+        </div>
+
+    `;
+
+    const outgoingMessageElement = createChatMessageElement(outgoingMessageHtml, "message--outgoing");
+    outgoingMessageElement.querySelector(".message__text").innerText = currentUserMessage;
+    chatHistoryContainer.appendChild(outgoingMessageElement);
+
+    messageForm.reset(); // Clear input field
+    document.body.classList.add("hide-header");
+    setTimeout(displayLoadingAnimation, 500); // Show loading animation after delay
+};
+
+// Toggle between light and dark themes
+themeToggleButton.addEventListener('click', () => {
+    const isLightTheme = document.body.classList.toggle("light_mode");
+    localStorage.setItem("themeColor", isLightTheme ? "light_mode" : "dark_mode");
+
+    // Update icon based on theme
+    const newIconClass = isLightTheme ? "bx bx-moon" : "bx bx-sun";
+    themeToggleButton.querySelector("i").className = newIconClass;
+});
+
+// Clear all chat history
+clearChatButton.addEventListener('click', () => {
+    if (confirm("Are you sure you want to delete all chat history?")) {
+        localStorage.removeItem("saved-api-chats");
+
+        // Reload chat history to reflect changes
+        loadSavedChatHistory();
+
+        currentUserMessage = null;
+        isGeneratingResponse = false;
+    }
+});
+
+// Handle click on suggestion items
+suggestionItems.forEach(suggestion => {
+    suggestion.addEventListener('click', () => {
+        currentUserMessage = suggestion.querySelector(".suggests__item-text").innerText;
+        handleOutgoingMessage();
+    });
+});
+
+// Prevent default from submission and handle outgoing message
+messageForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleOutgoingMessage();
+});
+
+// Load saved chat history on page load
+loadSavedChatHistory();
