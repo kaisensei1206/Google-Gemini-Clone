@@ -74,3 +74,73 @@ const createChatMessageElement = (htmlContent, ...cssClasses) => {
     messageElement.innerHTML = htmlContent;
     return messageElement;
 }
+
+// Show typing effect
+const showTypingEffect = (rawText, htmlText, messageElement, incomingMessageElement, skipEffect = false) => {
+    const copyIconElement = incomingMessageElement.querySelector(".message__icon");
+    copyIconElement.classList.add("hide"); // Initially hide copy button
+
+    if (skipEffect) {
+        // Display content directly without typing
+        messageElement.innerHTML = htmlText;
+        hljs.highlightAll();
+        addCopyButtonToCodeBlocks();
+        copyIconElement.classList.remove("hide"); // Show copy button
+        isGeneratingResponse = false;
+        return;
+    }
+
+    const wordsArray = rawText.split(' ');
+    let wordIndex = 0;
+
+    const typingInterval = setInterval(() => {
+        messageElement.innerText += (wordIndex === 0 ? '' : ' ') + wordsArray[wordIndex++];
+        if (wordIndex === wordsArray.length) {
+            clearInterval(typingInterval);
+            isGeneratingResponse = false;
+            messageElement.innerHTML = htmlText;
+            hljs.highlightAll();
+            addCopyButtonToCodeBlocks();
+            copyIconElement.classList.remove("hide");
+        }
+    }, 75);
+};
+// Fetch API response based on user input
+const requestApiResponse = async (incomingMessageElement) => {
+    const messageTextElement = incomingMessageElement.querySelector(".message__text");
+
+    try {
+        const response = await fetch(API_REQUEST_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: currentUserMessage }] }]
+            }),
+        });
+
+        const responseData = await response.json();
+        if (!response.ok) throw new Error(responseData.error.message);
+
+        const responseText = responseData?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) throw new Error("Invalid API response.");
+
+        const parsedApiResponse = marked.parse(responseText);
+        const rawApiResponse = responseText;
+
+        showTypingEffect(rawApiResponse, parsedApiResponse, messageTextElement, incomingMessageElement);
+
+        // Save conversation in local storage
+        let savedConversations = JSON.parse(localStorage.getItem("saved-api-chats")) || [];
+        savedConversations.push({
+            userMessage: currentUserMessage,
+            apiResponse: responseData
+        });
+        localStorage.setItem("saved-api-chats", JSON.stringify(savedConversations));
+    } catch (error) {
+        isGeneratingResponse = false;
+        messageTextElement.innerText = error.message;
+        messageTextElement.closest(".message").classList.add("message--error");
+    } finally {
+        incomingMessageElement.classList.remove("message--loading");
+    }
+};
