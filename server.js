@@ -1,3 +1,5 @@
+require('dotenv').config(); // 載入 .env 文件的環境變數
+
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
