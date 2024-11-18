@@ -9,7 +9,9 @@ const clearChatButton = document.getElementById("deleteButton");
 let currentUserMessage = null;
 let isGeneratingResponse = false;
 
+const GOOGLE_API_KEY = "YOUR_API_KEY";
 const API_REQUEST_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GOOGLE_API_KEY}`;
+
 // Load saved data from local storage
 const loadSavedChatHistory = () => {
     const savedConversations = JSON.parse(localStorage.getItem("saved-api-chats")) || [];
@@ -66,6 +68,7 @@ const loadSavedChatHistory = () => {
 
     document.body.classList.toggle("hide-header", savedConversations.length > 0);
 };
+
 // create a new chat message element
 const createChatMessageElement = (htmlContent, ...cssClasses) => {
     const messageElement = document.createElement("div");
@@ -104,6 +107,7 @@ const showTypingEffect = (rawText, htmlText, messageElement, incomingMessageElem
         }
     }, 75);
 };
+
 // Fetch API response based on user input
 const requestApiResponse = async (incomingMessageElement) => {
     const messageTextElement = incomingMessageElement.querySelector(".message__text");
@@ -143,6 +147,7 @@ const requestApiResponse = async (incomingMessageElement) => {
         incomingMessageElement.classList.remove("message--loading");
     }
 };
+
 // Add copy button to code blocks
 const addCopyButtonToCodeBlocks = () => {
     const codeBlocks = document.querySelectorAll('pre');
@@ -171,6 +176,7 @@ const addCopyButtonToCodeBlocks = () => {
         });
     });
 };
+
 // Show loading animation during API request
 const displayLoadingAnimation = () => {
     const loadingHtml = `
