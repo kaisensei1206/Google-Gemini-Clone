@@ -28,7 +28,7 @@ const loadSavedChatHistory = () => {
         const userMessageHtml = `
 
             <div class="message__content">
-                <img class="message__avatar" src="roxy.jpg" alt="User avatar">
+                <img class="message__avatar" src="roxy1.jpg" alt="User avatar">
                <p class="message__text">${conversation.userMessage}</p>
             </div>
         
@@ -219,7 +219,7 @@ const handleOutgoingMessage = () => {
     const outgoingMessageHtml = `
     
         <div class="message__content">
-            <img class="message__avatar" src="roxy.jpg alt="User avatar">
+            <img class="message__avatar" src="roxy1.jpg alt="User avatar">
             <p class="message__text"></p>
         </div>
 
