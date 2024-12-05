@@ -9,8 +9,7 @@ const clearChatButton = document.getElementById("deleteButton");
 let currentUserMessage = null;
 let isGeneratingResponse = false;
 
-const GOOGLE_API_KEY = "AIzaSyDdq8J8ITOT6wEv_hxfiYeIFwXSNWJHSlo";
-const API_REQUEST_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GOOGLE_API_KEY}`;
+const API_REQUEST_URL = '/api/generate'; // 指向你的後端 endpoint
 
 // Load saved data from local storage
 const loadSavedChatHistory = () => {
@@ -28,7 +27,7 @@ const loadSavedChatHistory = () => {
         const userMessageHtml = `
 
             <div class="message__content">
-                <img class="message__avatar" src="roxy.jpg" alt="User avatar">
+                <img class="message__avatar" src="roxy1.jpg" alt="User avatar">
                <p class="message__text">${conversation.userMessage}</p>
             </div>
         
@@ -219,7 +218,7 @@ const handleOutgoingMessage = () => {
     const outgoingMessageHtml = `
     
         <div class="message__content">
-            <img class="message__avatar" src="roxy.jpg alt="User avatar">
+            <img class="message__avatar" src="roxy1.jpg alt="User avatar">
             <p class="message__text"></p>
         </div>
 
